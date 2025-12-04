@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { analyzeAndSuggestTopics, generateFullScript } from './services/geminiService';
+import React, { useState, useEffect } from 'react';
+import { analyzeAndSuggestTopics, generateFullScript, getAvailableProviders, getDefaultProvider } from './services/geminiService';
 import { AppStep, ScriptAnalysisResponse, TopicSuggestion, AIProvider } from './types';
 import { StepIndicator } from './components/StepIndicator';
 import { AnalysisResult } from './components/AnalysisResult';
@@ -13,7 +13,22 @@ const App: React.FC = () => {
   const [generatedScript, setGeneratedScript] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [availableProviders, setAvailableProviders] = useState<AIProvider[]>([]);
   const [aiProvider, setAiProvider] = useState<AIProvider>('gemini');
+
+  useEffect(() => {
+    try {
+      const providers = getAvailableProviders();
+      setAvailableProviders(providers);
+      if (providers.length > 0) {
+        setAiProvider(getDefaultProvider());
+      } else {
+        setError('API 키가 설정되지 않았습니다. .env 파일에 GEMINI_API_KEY 또는 OPENAI_API_KEY를 설정해주세요.');
+      }
+    } catch (err) {
+      setError('API 키 설정을 확인해주세요.');
+    }
+  }, []);
 
   const handleAnalyze = async () => {
     if (!inputScript.trim()) {
@@ -111,31 +126,45 @@ const App: React.FC = () => {
             </p>
             
             {/* AI Provider Selection */}
-            <div className="mb-4 flex items-center gap-4">
-              <span className="text-sm font-medium text-slate-300">AI 엔진:</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setAiProvider('gemini')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    aiProvider === 'gemini'
-                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
-                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                  }`}
-                >
-                  🌟 Gemini
-                </button>
-                <button
-                  onClick={() => setAiProvider('openai')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    aiProvider === 'openai'
-                      ? 'bg-green-600 text-white shadow-lg shadow-green-500/30'
-                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                  }`}
-                >
-                  🤖 GPT-4
-                </button>
+            {availableProviders.length > 1 && (
+              <div className="mb-4 flex items-center gap-4">
+                <span className="text-sm font-medium text-slate-300">AI 엔진:</span>
+                <div className="flex gap-2">
+                  {availableProviders.includes('gemini') && (
+                    <button
+                      onClick={() => setAiProvider('gemini')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        aiProvider === 'gemini'
+                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                      }`}
+                    >
+                      🌟 Gemini
+                    </button>
+                  )}
+                  {availableProviders.includes('openai') && (
+                    <button
+                      onClick={() => setAiProvider('openai')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        aiProvider === 'openai'
+                          ? 'bg-green-600 text-white shadow-lg shadow-green-500/30'
+                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                      }`}
+                    >
+                      🤖 GPT-4
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
+            
+            {availableProviders.length === 1 && (
+              <div className="mb-4 p-3 bg-slate-700/50 rounded-lg border border-slate-600">
+                <p className="text-sm text-slate-300">
+                  {availableProviders[0] === 'gemini' ? '🌟 Gemini' : '🤖 GPT-4'} 사용 중
+                </p>
+              </div>
+            )}
 
             <textarea
               id="scriptInput"

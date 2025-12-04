@@ -23,14 +23,21 @@ AI 기반 유튜브 영상 대본 생성기입니다. 기존 대본을 분석하
    npm install
    ```
 
-2. `.env` 파일에 API 키 설정:
+2. `.env` 파일에 API 키 설정 (둘 중 하나만 설정해도 됩니다):
    ```
+   # Option 1: Gemini만 사용 (무료)
+   GEMINI_API_KEY=your_gemini_api_key_here
+   
+   # Option 2: GPT-4만 사용
+   OPENAI_API_KEY=your_openai_api_key_here
+   
+   # Option 3: 둘 다 사용 (선택 가능)
    GEMINI_API_KEY=your_gemini_api_key_here
    OPENAI_API_KEY=your_openai_api_key_here
    ```
    
-   - Gemini API 키: https://aistudio.google.com/apikey
-   - OpenAI API 키: https://platform.openai.com/api-keys
+   - Gemini API 키 (무료): https://aistudio.google.com/apikey
+   - OpenAI API 키 (유료): https://platform.openai.com/api-keys
 
 3. 개발 서버 실행:
    ```bash
@@ -42,7 +49,12 @@ AI 기반 유튜브 영상 대본 생성기입니다. 기존 대본을 분석하
 ## 🌐 배포 (Vercel)
 
 1. Vercel에 GitHub 저장소 연결
-2. 환경 변수 설정:
-   - `GEMINI_API_KEY`
-   - `OPENAI_API_KEY`
+2. 환경 변수 설정 (둘 중 하나만 설정해도 됩니다):
+   - `GEMINI_API_KEY` (권장, 무료)
+   - `OPENAI_API_KEY` (선택, 유료)
 3. 자동 배포 완료!
+
+## 💡 팁
+
+- **Gemini만 사용하는 경우**: 완전 무료로 사용 가능합니다!
+- **둘 다 설정**: 웹사이트에서 원하는 AI 엔진을 선택할 수 있습니다.

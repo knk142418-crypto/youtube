@@ -2,16 +2,43 @@ import { GoogleGenAI, Type } from "@google/genai";
 import OpenAI from "openai";
 import { ScriptAnalysisResponse, TopicSuggestion, AIProvider } from "../types";
 
-const geminiAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const openaiClient = new OpenAI({ 
+// API 키 확인
+const hasGeminiKey = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here';
+const hasOpenAIKey = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your_openai_api_key_here';
+
+const geminiAI = hasGeminiKey ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
+const openaiClient = hasOpenAIKey ? new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY,
   dangerouslyAllowBrowser: true 
-});
+}) : null;
+
+/**
+ * 사용 가능한 AI 제공자 확인
+ */
+export const getAvailableProviders = (): AIProvider[] => {
+  const providers: AIProvider[] = [];
+  if (hasGeminiKey) providers.push('gemini');
+  if (hasOpenAIKey) providers.push('openai');
+  return providers;
+};
+
+/**
+ * 기본 AI 제공자 반환
+ */
+export const getDefaultProvider = (): AIProvider => {
+  if (hasGeminiKey) return 'gemini';
+  if (hasOpenAIKey) return 'openai';
+  throw new Error('API 키가 설정되지 않았습니다. .env 파일에 GEMINI_API_KEY 또는 OPENAI_API_KEY를 설정해주세요.');
+};
 
 /**
  * Analyzes the input script/text and suggests new topics using Gemini.
  */
 const analyzeWithGemini = async (inputText: string): Promise<ScriptAnalysisResponse> => {
+  if (!geminiAI) {
+    throw new Error('Gemini API 키가 설정되지 않았습니다.');
+  }
+  
   const modelId = "gemini-2.0-flash-exp";
 
   const systemInstruction = `
@@ -61,6 +88,10 @@ const analyzeWithGemini = async (inputText: string): Promise<ScriptAnalysisRespo
  * Analyzes the input script/text and suggests new topics using OpenAI.
  */
 const analyzeWithOpenAI = async (inputText: string): Promise<ScriptAnalysisResponse> => {
+  if (!openaiClient) {
+    throw new Error('OpenAI API 키가 설정되지 않았습니다.');
+  }
+  
   const completion = await openaiClient.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
@@ -124,6 +155,10 @@ export const analyzeAndSuggestTopics = async (
  * Generates a full script using Gemini.
  */
 const generateWithGemini = async (topic: TopicSuggestion, originalContext: string, tone: string): Promise<string> => {
+  if (!geminiAI) {
+    throw new Error('Gemini API 키가 설정되지 않았습니다.');
+  }
+  
   const modelId = "gemini-2.0-flash-exp";
 
   const prompt = `
@@ -159,6 +194,10 @@ const generateWithGemini = async (topic: TopicSuggestion, originalContext: strin
  * Generates a full script using OpenAI.
  */
 const generateWithOpenAI = async (topic: TopicSuggestion, originalContext: string, tone: string): Promise<string> => {
+  if (!openaiClient) {
+    throw new Error('OpenAI API 키가 설정되지 않았습니다.');
+  }
+  
   const prompt = `
     다음 주제로 유튜브 영상 대본을 작성해줘.
     
