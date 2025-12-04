@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { analyzeAndSuggestTopics, generateFullScript } from './services/geminiService';
-import { AppStep, ScriptAnalysisResponse, TopicSuggestion } from './types';
+import { AppStep, ScriptAnalysisResponse, TopicSuggestion, AIProvider } from './types';
 import { StepIndicator } from './components/StepIndicator';
 import { AnalysisResult } from './components/AnalysisResult';
 import { GeneratedScript } from './components/GeneratedScript';
@@ -13,6 +13,7 @@ const App: React.FC = () => {
   const [generatedScript, setGeneratedScript] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aiProvider, setAiProvider] = useState<AIProvider>('gemini');
 
   const handleAnalyze = async () => {
     if (!inputScript.trim()) {
@@ -23,7 +24,7 @@ const App: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await analyzeAndSuggestTopics(inputScript);
+      const result = await analyzeAndSuggestTopics(inputScript, aiProvider);
       setAnalysis(result);
       setStep(AppStep.SELECTING);
     } catch (err) {
@@ -43,7 +44,7 @@ const App: React.FC = () => {
     
     try {
       // Pass original script for context and analyzed tone
-      const script = await generateFullScript(topic, inputScript, analysis.tone);
+      const script = await generateFullScript(topic, inputScript, analysis.tone, aiProvider);
       setGeneratedScript(script);
       setStep(AppStep.RESULT);
     } catch (err) {
@@ -108,6 +109,34 @@ const App: React.FC = () => {
             <p className="text-sm text-slate-400 mb-4">
               평소 영상 스타일, 말투, 주로 다루는 내용을 파악하기 위해 사용됩니다. (짧아도 괜찮아요!)
             </p>
+            
+            {/* AI Provider Selection */}
+            <div className="mb-4 flex items-center gap-4">
+              <span className="text-sm font-medium text-slate-300">AI 엔진:</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setAiProvider('gemini')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    aiProvider === 'gemini'
+                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  }`}
+                >
+                  🌟 Gemini
+                </button>
+                <button
+                  onClick={() => setAiProvider('openai')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    aiProvider === 'openai'
+                      ? 'bg-green-600 text-white shadow-lg shadow-green-500/30'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  }`}
+                >
+                  🤖 GPT-4
+                </button>
+              </div>
+            </div>
+
             <textarea
               id="scriptInput"
               className="w-full h-64 bg-slate-900 border border-slate-700 rounded-lg p-4 text-slate-200 placeholder-slate-600 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none transition-all"

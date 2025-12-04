@@ -16,3 +16,5 @@ export enum AppStep {
   GENERATING = 'GENERATING',
   RESULT = 'RESULT',
 }
+
+export type AIProvider = 'gemini' | 'openai';
