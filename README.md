@@ -23,38 +23,35 @@ AI 기반 유튜브 영상 대본 생성기입니다. 기존 대본을 분석하
    npm install
    ```
 
-2. `.env` 파일에 API 키 설정 (둘 중 하나만 설정해도 됩니다):
-   ```
-   # Option 1: Gemini만 사용 (무료)
-   GEMINI_API_KEY=your_gemini_api_key_here
-   
-   # Option 2: GPT-4만 사용
-   OPENAI_API_KEY=your_openai_api_key_here
-   
-   # Option 3: 둘 다 사용 (선택 가능)
-   GEMINI_API_KEY=your_gemini_api_key_here
-   OPENAI_API_KEY=your_openai_api_key_here
-   ```
-   
-   - Gemini API 키 (무료): https://aistudio.google.com/apikey
-   - OpenAI API 키 (유료): https://platform.openai.com/api-keys
-
-3. 개발 서버 실행:
+2. 개발 서버 실행:
    ```bash
    npm run dev
    ```
 
-4. 브라우저에서 http://localhost:3000 접속
+3. 브라우저에서 http://localhost:3000 접속
+
+4. **웹사이트에서 API 키 입력**:
+   - 처음 접속하면 API 키 입력 모달이 자동으로 나타납니다
+   - Gemini 또는 OpenAI API 키 중 하나만 입력해도 됩니다
+   - 입력한 키는 브라우저에 안전하게 저장됩니다
+   
+   **API 키 발급:**
+   - Gemini API 키 (무료): https://aistudio.google.com/apikey
+   - OpenAI API 키 (유료): https://platform.openai.com/api-keys
+
+💡 **Tip:** 헤더의 "API 설정" 버튼을 클릭하면 언제든지 API 키를 변경할 수 있습니다.
 
 ## 🌐 배포 (Vercel)
 
 1. Vercel에 GitHub 저장소 연결
-2. 환경 변수 설정 (둘 중 하나만 설정해도 됩니다):
-   - `GEMINI_API_KEY` (권장, 무료)
-   - `OPENAI_API_KEY` (선택, 유료)
-3. 자동 배포 완료!
+2. 자동 배포 완료!
+3. 배포된 사이트에서 API 키를 웹 UI로 입력하여 사용
 
-## 💡 팁
+💡 **더 이상 환경 변수 설정이 필요 없습니다!** 모든 API 키는 웹사이트에서 직접 입력하고 브라우저에 저장됩니다.
 
-- **Gemini만 사용하는 경우**: 완전 무료로 사용 가능합니다!
-- **둘 다 설정**: 웹사이트에서 원하는 AI 엔진을 선택할 수 있습니다.
+## 💡 주요 기능
+
+- **쉬운 API 키 관리**: 웹 UI에서 직접 입력 및 저장
+- **완전 무료 사용 가능**: Gemini API 키만 있으면 OK!
+- **듀얼 AI 지원**: Gemini와 GPT-4 중 선택 가능
+- **브라우저 저장**: API 키를 localStorage에 안전하게 보관
