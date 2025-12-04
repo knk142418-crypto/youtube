@@ -15,20 +15,46 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [availableProviders, setAvailableProviders] = useState<AIProvider[]>([]);
   const [aiProvider, setAiProvider] = useState<AIProvider>('gemini');
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [geminiApiKey, setGeminiApiKey] = useState('');
+  const [openaiApiKey, setOpenaiApiKey] = useState('');
 
   useEffect(() => {
-    try {
-      const providers = getAvailableProviders();
-      setAvailableProviders(providers);
-      if (providers.length > 0) {
-        setAiProvider(getDefaultProvider());
-      } else {
-        setError('API 키가 설정되지 않았습니다. .env 파일에 GEMINI_API_KEY 또는 OPENAI_API_KEY를 설정해주세요.');
-      }
-    } catch (err) {
-      setError('API 키 설정을 확인해주세요.');
-    }
+    // localStorage에서 API 키 불러오기
+    const savedGeminiKey = localStorage.getItem('gemini_api_key') || '';
+    const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
+    setGeminiApiKey(savedGeminiKey);
+    setOpenaiApiKey(savedOpenaiKey);
+    
+    checkApiKeys(savedGeminiKey, savedOpenaiKey);
   }, []);
+
+  const checkApiKeys = (geminiKey: string, openaiKey: string) => {
+    const providers: AIProvider[] = [];
+    if (geminiKey) providers.push('gemini');
+    if (openaiKey) providers.push('openai');
+    
+    setAvailableProviders(providers);
+    if (providers.length > 0) {
+      setAiProvider(providers[0]);
+      setError(null);
+    } else {
+      setShowApiKeyModal(true);
+    }
+  };
+
+  const handleSaveApiKeys = () => {
+    if (!geminiApiKey && !openaiApiKey) {
+      setError('최소 하나의 API 키를 입력해주세요.');
+      return;
+    }
+    
+    localStorage.setItem('gemini_api_key', geminiApiKey);
+    localStorage.setItem('openai_api_key', openaiApiKey);
+    checkApiKeys(geminiApiKey, openaiApiKey);
+    setShowApiKeyModal(false);
+    setError(null);
+  };
 
   const handleAnalyze = async () => {
     if (!inputScript.trim()) {
@@ -82,6 +108,79 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 pb-20 font-sans selection:bg-indigo-500 selection:text-white">
+      {/* API Key Modal */}
+      {showApiKeyModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 max-w-2xl w-full shadow-2xl">
+            <h2 className="text-2xl font-bold mb-4 text-white">🔑 API 키 설정</h2>
+            <p className="text-slate-400 mb-6">
+              AI 기능을 사용하려면 최소 하나의 API 키가 필요합니다. (둘 중 하나만 입력해도 됩니다)
+            </p>
+
+            <div className="space-y-6">
+              {/* Gemini API Key */}
+              <div>
+                <label className="block text-sm font-semibold text-white mb-2">
+                  🌟 Google Gemini API 키 (권장, 무료)
+                </label>
+                <input
+                  type="text"
+                  value={geminiApiKey}
+                  onChange={(e) => setGeminiApiKey(e.target.value)}
+                  placeholder="AIzaSy..."
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                />
+                <a
+                  href="https://aistudio.google.com/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2 text-sm text-indigo-400 hover:text-indigo-300"
+                >
+                  → Gemini API 키 발급받기
+                </a>
+              </div>
+
+              {/* OpenAI API Key */}
+              <div>
+                <label className="block text-sm font-semibold text-white mb-2">
+                  🤖 OpenAI API 키 (선택, 유료)
+                </label>
+                <input
+                  type="text"
+                  value={openaiApiKey}
+                  onChange={(e) => setOpenaiApiKey(e.target.value)}
+                  placeholder="sk-..."
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 placeholder-slate-500 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                />
+                <a
+                  href="https://platform.openai.com/api-keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2 text-sm text-green-400 hover:text-green-300"
+                >
+                  → OpenAI API 키 발급받기
+                </a>
+              </div>
+            </div>
+
+            {error && (
+              <div className="mt-4 bg-red-500/10 border border-red-500/50 text-red-200 p-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            <div className="mt-8 flex gap-3">
+              <button
+                onClick={handleSaveApiKeys}
+                className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3 px-6 rounded-lg transition-all shadow-lg"
+              >
+                💾 저장하고 시작하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -95,6 +194,16 @@ const App: React.FC = () => {
               TubeGenius
             </h1>
           </div>
+          <button
+            onClick={() => setShowApiKeyModal(true)}
+            className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            API 설정
+          </button>
         </div>
       </header>
 
