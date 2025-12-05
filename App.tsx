@@ -747,11 +747,19 @@ const App: React.FC = () => {
     alert("✅ 모든 내용이 초기화되었습니다!");
   };
 
-  const handleSaveApiKey = async (key: string) => {
-    saveApiKey(key);
+  const handleSaveApiKey = async (key: string, remember: boolean) => {
+    if (remember) {
+      saveApiKey(key);
+    } else {
+      // 기억하지 않으면 localStorage에서 삭제
+      localStorage.removeItem("gemini_api_key");
+    }
     setApiKey(key);
     setShowApiKeyModal(false);
-    alert("✅ API 키가 성공적으로 설정되었습니다!");
+    alert(remember 
+      ? "✅ API 키가 성공적으로 저장되었습니다!" 
+      : "✅ API 키가 현재 세션에만 설정되었습니다. (브라우저를 닫으면 삭제됩니다)"
+    );
   };
 
   const handleDeleteApiKey = (e: React.MouseEvent) => {

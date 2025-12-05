@@ -4,7 +4,7 @@ import { FiX, FiSave, FiTrash2 } from "react-icons/fi";
 interface ApiKeyModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (apiKey: string) => Promise<void>;
+  onSave: (apiKey: string, remember: boolean) => Promise<void>;
   currentApiKey: string | null;
   isValidating?: boolean;
 }
@@ -18,6 +18,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
 }) => {
   const [apiKey, setApiKey] = useState(currentApiKey || "");
   const [showKey, setShowKey] = useState(false);
+  const [rememberKey, setRememberKey] = useState(!!currentApiKey);
 
   useEffect(() => {
     if (currentApiKey) {
@@ -29,7 +30,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
 
   const handleSave = async () => {
     if (apiKey.trim()) {
-      await onSave(apiKey.trim());
+      await onSave(apiKey.trim(), rememberKey);
     }
   };
 
@@ -107,17 +108,31 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
             />
           </div>
 
-          <div className="flex items-center mb-4">
-            <input
-              type="checkbox"
-              id="showKey"
-              checked={showKey}
-              onChange={(e) => setShowKey(e.target.checked)}
-              className="mr-2"
-            />
-            <label htmlFor="showKey" className="text-sm text-gray-300">
-              API 키 표시
-            </label>
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="showKey"
+                checked={showKey}
+                onChange={(e) => setShowKey(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <label htmlFor="showKey" className="ml-2 text-sm text-gray-300">
+                API 키 표시
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="rememberKey"
+                checked={rememberKey}
+                onChange={(e) => setRememberKey(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <label htmlFor="rememberKey" className="ml-2 text-sm text-gray-300">
+                API 키 기억하기 (브라우저에 저장)
+              </label>
+            </div>
           </div>
         </div>
 

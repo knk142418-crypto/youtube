@@ -1,6 +1,16 @@
-# 유튜브 영상 분석 AI 웹사이트
+# 🎬 YouTube 영상 분석 AI
 
-AI를 활용한 유튜브 영상 대본 분석 및 콘텐츠 기획 도구입니다.
+> AI 기반 유튜브 영상 대본 분석 및 콘텐츠 기획 자동화 도구
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/knk142418-crypto/youtube)
+
+## ✨ 특징
+
+- 🤖 **Google Gemini AI** 기반 강력한 분석 엔진
+- 🔒 **프라이버시 보호**: API 키는 브라우저에만 저장 (서버 전송 없음)
+- 💾 **로컬 저장**: 분석 결과 자동 저장으로 데이터 손실 방지
+- 🎨 **깔끔한 UI**: 직관적이고 사용하기 쉬운 인터페이스
+- ⚡ **빠른 배포**: Vercel을 통한 원클릭 배포
 
 ## 🎯 주요 기능
 
@@ -143,14 +153,41 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 ## 🚀 배포
 
-### Vercel 배포
+### Vercel 배포 (추천)
 
-1. GitHub에 코드 푸시
-2. Vercel에서 프로젝트 import
-3. 환경 변수 설정 (GEMINI_API_KEY)
-4. 배포 완료
+1. **GitHub 저장소 연결**
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin master
+   ```
 
-자세한 배포 가이드는 `DEPLOYMENT.md` 참조
+2. **Vercel 배포**
+   - [Vercel](https://vercel.com)에 로그인
+   - "New Project" 클릭
+   - GitHub 저장소 선택
+   - 프로젝트 Import
+   - 자동 배포 완료! 🎉
+
+3. **환경 변수 설정 (선택사항)**
+   - Vercel 대시보드 → Settings → Environment Variables
+   - `VITE_GEMINI_API_KEY` 추가 (선택사항 - 사용자가 직접 입력 가능)
+
+4. **도메인 설정**
+   - Vercel에서 자동으로 `.vercel.app` 도메인 제공
+   - 커스텀 도메인 연결 가능
+
+### 📱 API 키 관리
+
+이 앱은 **클라이언트 사이드에서 API 키를 관리**합니다:
+
+- ✅ **사용자 직접 입력**: 각 사용자가 자신의 API 키 입력
+- ✅ **로컬 저장**: 브라우저 localStorage에 안전하게 저장
+- ✅ **기억하기 기능**: "기억하기" 체크 시 API 키 자동 저장
+- ✅ **프라이버시**: API 키는 절대 서버로 전송되지 않음
+- ✅ **무료 사용**: 각 사용자가 자신의 무료 API 할당량 사용
+
+**API 키 발급 방법**은 앱 내 "API 키 발급 방법 보기" 링크 참조
 
 ## 📋 지원 카테고리
 
